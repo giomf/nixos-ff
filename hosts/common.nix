@@ -1,7 +1,15 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix = {
+    settings.experimental-features = [ "nix-command" "flakes" ];
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
+    };
+  };
+  boot.supportedFilesystems.zfs = lib.mkForce false;
   time.timeZone = "Europe/Berlin";
   console = {
     keyMap = "de";
@@ -48,14 +56,17 @@
   };
 
   # User
-  users.users = {
-    #disable root password
-    root.hashedPassword = "!";
-    guif = {
-      isNormalUser = true;
-      shell = pkgs.fish;
-      initialHashedPassword = "$y$j9T$hHZ1NIxqNvPno5mkSDSjI1$PojSMDbnHYHcrrdaTw74w6tSlLIRvMCbCbaCiDpMx3.";
-      extraGroups = [ "wheel" ];
+  users = {
+    groups.ssh = { };
+    users = {
+      #disable root password
+      root.hashedPassword = "!";
+      guif = {
+        isNormalUser = true;
+        shell = pkgs.fish;
+        initialHashedPassword = "$y$j9T$hHZ1NIxqNvPno5mkSDSjI1$PojSMDbnHYHcrrdaTw74w6tSlLIRvMCbCbaCiDpMx3.";
+        extraGroups = [ "wheel" "ssh" ];
+      };
     };
   };
 }

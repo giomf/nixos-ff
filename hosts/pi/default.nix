@@ -1,7 +1,10 @@
 { pkgs, ... }:
 
 {
-  imports = [ ../common.nix ./network.nix ];
+  imports = [ ../common.nix ./network.nix ./divera-reports.nix ./divera-monitor ];
+
+  boot.loader.raspberryPi.firmwareConfig = [ "force_turbo=1" ];
+  hardware.enableRedistributableFirmware = true;
 
   system.stateVersion = "23.05";
   nix.settings.trusted-users = [ "@wheel" ];
@@ -18,9 +21,16 @@
     };
   };
 
-
-  # Allow ssh in
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      PubkeyAuthentication = true;
+      PermitRootLogin = "no";
+      AllowGroups = [ "ssh" ];
+    };
+  };
 
   sdImage.compressImage = false;
+
 }

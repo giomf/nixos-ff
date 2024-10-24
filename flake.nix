@@ -13,14 +13,29 @@
     # NixOs hardware quirks
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
+    divera-reports = {
+      url = "github:giomf/divera-reports";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Secret handling
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      # Deactivate darwin packages
+      inputs.darwin.follows = "";
+    };
+
   };
 
-  outputs = { nixpkgs, home-manager, nixos-hardware, ... }: {
+  outputs = { nixpkgs, home-manager, nixos-hardware, agenix, divera-reports, ... }: {
     nixosConfigurations = {
-      "pi" = nixpkgs.lib.nixosSystem {
+      "EppdPi" = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
           ./hosts/pi
+          divera-reports.nixosModules.default
+          agenix.nixosModules.default
           "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           nixos-hardware.nixosModules.raspberry-pi-3
           home-manager.nixosModules.home-manager
