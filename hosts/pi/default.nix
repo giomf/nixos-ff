@@ -1,7 +1,13 @@
 { pkgs, ... }:
 
 {
-  imports = [ ../common.nix ./network.nix ./divera-reports.nix ./divera-monitor ];
+  imports = [
+    ../common.nix
+    ./network.nix
+    ./divera-monitor
+    ./divera-reports.nix
+    ./divera-status-tracker.nix
+  ];
 
   boot.loader.raspberryPi.firmwareConfig = [ "force_turbo=1" ];
   hardware.enableRedistributableFirmware = true;
@@ -15,8 +21,9 @@
   users = {
     users = {
       "guif" = {
-        openssh.authorizedKeys.keys =
-          [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIPI4hVcnH2C5Rq0Pkgv+rw2h1dAm2QQdyboDfW7kUlw guif@glap" ];
+        openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIPI4hVcnH2C5Rq0Pkgv+rw2h1dAm2QQdyboDfW7kUlw guif@glap"
+        ];
       };
     };
   };
