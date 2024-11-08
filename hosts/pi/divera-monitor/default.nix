@@ -19,7 +19,14 @@ in
     program = pkgs.writeShellScript "divera-monitor" ''
       AUTO_LOGIN="$(sudo cat ${config.age.secrets.divera-monitor-autologin.path})"
       wlr-randr --output Unknown-1 --transform 90
-      ${pkgs.chromium}/bin/chromium --kiosk --incognito --disable-session-crashed-bubble --disable-infobars --no-first-run ${monitor_url}?autologin="''${AUTO_LOGIN}"
+      ${pkgs.chromium}/bin/chromium \
+        --kiosk \
+        --incognito \
+        --disable-session-crashed-bubble \
+        --disable-infobars \
+        --no-first-run \
+        --hide-scrollbars \
+        ${monitor_url}?autologin="''${AUTO_LOGIN}"
     '';
   };
 }
