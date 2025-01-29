@@ -4,7 +4,7 @@ let
   monitor_url = "https://app.divera247.com/monitor/1.html";
 in
 {
-  age.secrets.divera-monitor-autologin.file = ../../../secrets/divera-monitor-autologin.age;
+  age.secrets.divera-monitor-autologin.file = ../../../../secrets/divera-monitor-autologin.age;
   environment.defaultPackages = with pkgs; [
     chromium
     wlr-randr

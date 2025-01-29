@@ -1,3 +1,6 @@
 [submodule "home"]
 	path = home
 	url = git@github.com:giomf/nixos-home.git
+[submodule "common"]
+	path = common
+	url = git@github.com:giomf/nixos-common.git

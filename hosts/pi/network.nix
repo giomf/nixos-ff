@@ -5,11 +5,14 @@ let
   wifi_interface = "wlan0";
   ap_interface = "ap0";
 
-in {
+in
+{
+
+  imports = [
+    ./access_point.nix
+  ];
+
   # Networking
-  boot.kernel.sysctl = { "net.ipv4.conf.all.forwarding" = true; };
-  age.secrets.access-point-password.file = ../../secrets/access-point-password.age;
-  systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
   systemd.network = {
     enable = true;
     # broken: https://github.com/NixOS/nixpkgs/issues/247608
@@ -32,7 +35,10 @@ in {
     networks = {
       "10-lan" = {
         matchConfig.Name = "${lan_interface}";
-        networkConfig.DHCP = "yes";
+        networkConfig = {
+          DHCP = "yes";
+          # Address = "192.168.2.1/24";
+        };
         linkConfig.RequiredForOnline = "no";
       };
       "20-wireless" = {
@@ -59,50 +65,18 @@ in {
     networkmanager.enable = false;
     firewall = {
       enable = true;
-      interfaces.${ap_interface}.allowedUDPPorts = lib.optionals config.services.dnsmasq.enable [ 53 67 ];
+      interfaces.${ap_interface}.allowedUDPPorts = lib.optionals config.services.dnsmasq.enable [
+        53
+        67
+      ];
     };
     wireless = {
       enable = true;
       interfaces = [ "${wifi_interface}" ];
-      networks = { "datWLAN" = { }; };
-    };
-  };
-
-  # # Enable hostapd to set up the access point on wlan1 (USB WiFi)
-  services.hostapd = {
-    enable = true;
-    radios.${ap_interface} = {
-      networks.${ap_interface} = {
-        ssid = "EppdPiAP";
-        # ignoreBroadcastSsid = "clear";
-        authentication = {
-          mode = "wpa3-sae-transition";
-          saePasswordsFile = config.age.secrets.access-point-password.path;
-          wpaPasswordFile = config.age.secrets.access-point-password.path;
-        };
+      networks = {
+        "datWLAN" = { };
       };
     };
   };
 
-  # Sometimes slow connection speeds are attributed to absence of haveged.
-  services.haveged.enable = config.services.hostapd.enable;
-
-  # # Enable DHCP server for devices connecting to the access point (USB WiFi)
-  services.dnsmasq = {
-    enable = true;
-    # requires = [ "hostapd.service" ];
-    # after = [ "hostapd.service" ];
-    settings = {
-      interface = [ "${ap_interface}" ];
-      bind-interfaces = true;
-      except-interface = [ "lo" ];
-      dhcp-range = [ "192.168.1.10,192.168.1.100,12h" ];
-      listen-address = [ "192.168.1.1" ];
-    };
-  };
-
-  systemd.services.dnsmasq = {
-    requires = [ "${config.systemd.services.hostapd.name}" ];
-    after = [ "${config.systemd.services.hostapd.name}" ];
-  };
 }

@@ -1,43 +1,32 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = [
-    ../common.nix
+    ../../common/server.nix
+    # ./bsp.nix
     ./network.nix
-    ./divera-monitor
-    ./divera-reports.nix
-    ./divera-status-tracker.nix
   ];
 
-  boot.loader.raspberryPi.firmwareConfig = [ "force_turbo=1" ];
+  # DEBUG
+  boot.crashDump = {
+    architectureOptions = [ ];
+    kernelParams = [
+      "1"
+      "boot.shell_on_fail"
+      "console=ttyS0,115200n8"
+      "console=tty0"
+    ];
+    enable = true;
+  };
+
   hardware.enableRedistributableFirmware = true;
+  boot.supportedFilesystems.zfs = lib.mkForce false;
+
+  documentation.man.generateCaches = false;
 
   system.stateVersion = "23.05";
   nix.settings.trusted-users = [ "@wheel" ];
   environment.systemPackages = with pkgs; [ libraspberrypi ];
   environment.defaultPackages = with pkgs; [ ];
-
-  # User
-  users = {
-    users = {
-      "guif" = {
-        openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIPI4hVcnH2C5Rq0Pkgv+rw2h1dAm2QQdyboDfW7kUlw guif@glap"
-        ];
-      };
-    };
-  };
-
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      PubkeyAuthentication = true;
-      PermitRootLogin = "no";
-      AllowGroups = [ "ssh" ];
-    };
-  };
-
   sdImage.compressImage = false;
-
 }

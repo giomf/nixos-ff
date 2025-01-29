@@ -1,5 +1,5 @@
 let
-  eppdpi = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjEKpYYND9htelGOXBT0fyVgRXC5um2ONdyL1Oj80JJ";
+  eppdpi = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA4Vf3XnR+/Uxw4w54ewPO04OdPlP5+Hq62PBxX57NG2";
 in
 {
   "divera-reports-config.age".publicKeys = [ eppdpi ];
